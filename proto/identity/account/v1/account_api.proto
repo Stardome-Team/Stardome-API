@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package stardome.identity.account.v1;
+
+option go_package = "internal/account/pb;pb";
+
+//import "Stardome-API/proto/identity/account/v1/account.proto";
+
+import "identity/account/v1/account.proto";
+
+service AccountApi {
+  rpc RegisterAccount (AccountRegistrationRequest) returns (AccountResponse);
+  rpc FindAccountByAccountID (AccountRequest) returns (AccountResponse);
+}

@@ -14,9 +14,10 @@ import (
 
 // Token :
 type Token struct {
-	Token     *string `json:"token"`
-	ExpiresOn int64   `json:"expiresOn"`
-	Type      string  `json:"type"`
+	Type         string  `json:"type"`
+	Token        *string `json:"token"`
+	ExpiresOn    int64   `json:"expiresOn"`
+	RefreshToken *string `json:"refreshToken"`
 }
 
 const (
@@ -24,11 +25,15 @@ const (
 )
 
 // GenerateToken :
-func GenerateToken(host *string, playload map[string]interface{}) *Token {
+func GenerateToken(host *string, payload map[string]interface{}) *Token {
 
 	token := jwt.NewJWT()
 
 	issueAt, err := token.Claims.GetIssuedAt()
+	if err != nil {
+		return nil
+	}
+
 	notBefore := issueAt.Add(time.Second * 3)
 	expiration := issueAt.Add(time.Hour * 1)
 
@@ -36,7 +41,7 @@ func GenerateToken(host *string, playload map[string]interface{}) *Token {
 	token.Claims.SetExpiration(expiration)
 	token.Claims.SetIssuer(*host)
 
-	for key, value := range playload {
+	for key, value := range payload {
 		token.Claims.Set(key, value)
 	}
 

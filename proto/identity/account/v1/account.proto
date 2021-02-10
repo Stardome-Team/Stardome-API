@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package stardome.identity.account.v1;
+
+option go_package = "internal/account/pb;pb";
+
+import "google/protobuf/timestamp.proto";
+
+message AccountRegistrationRequest {
+    string accountID = 1;
+    string username = 2;
+    string passwordHash = 3;
+    string emailAddress = 4;
+    google.protobuf.Timestamp dateOfBirth = 5;
+}
+
+message AccountResponse {
+    int64 id = 1;
+    string accountID = 2;
+    string username = 3;
+    string emailAddress = 4;
+    google.protobuf.Timestamp dateOfBirth = 5;
+    google.protobuf.Timestamp createdAt = 6;
+    google.protobuf.Timestamp updatedAt = 7;
+    google.protobuf.Timestamp deletedAt = 8;
+}
+
+message AccountRequest {
+    int64 id = 1;
+    string accountID = 2;
+    string username = 3;
+    string emailAddress = 4;
+    google.protobuf.Timestamp dateOfBirth = 5;
+    google.protobuf.Timestamp createdAt = 6;
+    google.protobuf.Timestamp updatedAt = 7;
+    google.protobuf.Timestamp deletedAt = 8;
+}

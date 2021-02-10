@@ -2,18 +2,16 @@ package errors
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
+	"github.com/stoewer/go-strcase"
 	"net/http"
 	"reflect"
-
-	"github.com/stoewer/go-strcase"
-
-	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"
 )
 
 // ErrorHandlerMiddleware :
-func ErrorHandlerMiddleware() gin.HandlerFunc {
+func ErrorHandlerMiddleware(customValidationError func(validator.FieldError) string) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		c.Next()
@@ -30,7 +28,15 @@ func ErrorHandlerMiddleware() gin.HandlerFunc {
 						errs := e.Err.(validator.ValidationErrors)
 
 						for _, err := range errs {
-							errorsList = append(errorsList, validationErrorToObject(err, c))
+							var validatorError string
+
+							if customValidationError == nil {
+								validatorError = DefaultValidationError(err)
+							} else {
+								validatorError = customValidationError(err)
+							}
+
+							errorsList = append(errorsList, bindErrorToObject(validatorError, c))
 						}
 					} else {
 						errorsList = append(errorsList, ErrorObject{
@@ -76,9 +82,10 @@ func ErrorHandlerMiddleware() gin.HandlerFunc {
 	}
 }
 
-func validationErrorToObject(e validator.FieldError, c *gin.Context) ErrorObject {
-	var field string = strcase.LowerCamelCase(e.Field())
+func DefaultValidationError(e validator.FieldError) string {
+	field := strcase.LowerCamelCase(e.Field())
 	var message string
+
 	switch e.Tag() {
 	case "required":
 		message = fmt.Sprintf("%s is required", field)
@@ -97,6 +104,11 @@ func validationErrorToObject(e validator.FieldError, c *gin.Context) ErrorObject
 	if len(message) == 0 {
 		message = fmt.Sprintf("%s is not valid", field)
 	}
+
+	return message
+}
+
+func bindErrorToObject(message string, c *gin.Context) ErrorObject {
 
 	return ErrorObject{
 		Domain:  c.Request.URL.Path,

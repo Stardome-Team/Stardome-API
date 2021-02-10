@@ -1,6 +1,9 @@
 package responses
 
-import "github.com/Stardome-Team/Stardome-API/pkg/errors"
+import (
+	"github.com/Stardome-Team/Stardome-API/pkg/errors"
+	"github.com/Stardome-Team/Stardome-API/pkg/jwt"
+)
 
 // Response This is the model for all responses returned
 type Response struct {
@@ -9,6 +12,7 @@ type Response struct {
 	ID         *string                `json:"id,omitempty"`
 	Method     *string                `json:"method,omitempty"`
 	Params     map[string]interface{} `json:"params,omitempty"`
+	Token      jwt.Token              `json:"token,omitempty"`
 	Data
 	errors.Error
 }
